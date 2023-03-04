@@ -8,7 +8,8 @@ stages:
     - prepare.seed
     - prepare.split
     outs:
-    - data/prepared
+    - data/prepared:
+        remote: production
   featurize:
     cmd: python src/featurization.py data/prepared data/features
     deps:
@@ -18,7 +19,8 @@ stages:
     - featurize.max_features
     - featurize.ngrams
     outs:
-    - data/features
+    - data/features:
+        remote: sandbox
   train:
     cmd: python src/train.py data/features model.pkl
     deps:
@@ -29,7 +31,8 @@ stages:
     - train.n_est
     - train.seed
     outs:
-    - model.pkl
+    - model.pkl:
+        remote: production 
   evaluate:
     cmd: python src/evaluate.py model.pkl data/features
     deps:
@@ -37,14 +40,15 @@ stages:
     - model.pkl
     - src/evaluate.py
     outs:
-    - eval/importance.png
+    - eval/importance.png:
+        remote: production
     - eval/live/plots:
-        cache: false
+        remote: production 
     - eval/prc:
-        cache: false
+        remote: sandbox
     metrics:
     - eval/live/metrics.json:
-        cache: false
+        remote: sandbox
 plots:
   - ROC:
       template: simple
